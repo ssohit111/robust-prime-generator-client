@@ -1,6 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useState, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
+import ClipLoader from "react-spinners/ClipLoader";
+
 const PrintPrimes = () => {
 
     //Prime generator function (Brute Approach)
@@ -97,12 +99,14 @@ const PrintPrimes = () => {
     let flag = true;
     if (High < Low) flag = false;
     const [Output, setOutput] = useState([]);
-    useLayoutEffect(() => {
+    const [isLoading, setisLoading] = useState(true);
+    useEffect(() => {
         const start = window.performance.now();
         if (newChoice === 1) setOutput(getprimeBrute(Low, High));
         else if (newChoice === 2) setOutput(getprimeSqrt(Low, High));
         else setOutput(getprimeSegmentedSeive(Low, High));
         const end = window.performance.now();
+        setisLoading(false);
         const time_elapsed = end - start;
         // console.log(`Time taken is ${time_elapsed} ms`);
 
@@ -111,17 +115,21 @@ const PrintPrimes = () => {
         <div className='myclass' style={{ paddingTop: "20px", paddingLeft: "20px" }}>
             <br />
             {flag === false ? (<h1>Oops !! Invalid Input</h1>) : (
-                <div>{Output.length === 0 ? (<h1>No Prime Numbers in the range of {Low} to {High}</h1>) : (
-                    <div>
-                        <h4 style={{}}>Number of Prime Numbers in the range {Low} to {High} is {Output.length} </h4>
-                        <h4>Below is the list : </h4>
-                        <ul>
-                            {
-                                Output.map((item) => <li key={item}>{item}</li>)
-                            }
-                        </ul>
-                    </div>
-                )}</div>
+                <div >
+                    {isLoading === true ? (<div className='centering'><ClipLoader color={"36D7B7"} size={150} loading={isLoading} /></div>) : (
+                        <div>{Output.length === 0 ? (<h1>No Prime Numbers in the range of {Low} to {High}</h1>) : (
+                            <div>
+                                <h4 style={{}}>Number of Prime Numbers in the range {Low} to {High} is {Output.length} </h4>
+                                <h4>Below is the list : </h4>
+                                <ul>
+                                    {
+                                        Output.map((item) => <li key={item}>{item}</li>)
+                                    }
+                                </ul>
+                            </div>
+                        )}</div>
+                    )}
+                </div>
             )}
         </div>
     )
