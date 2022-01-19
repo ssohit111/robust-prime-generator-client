@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import ClipLoader from "react-spinners/ClipLoader";
-
+import axios from 'axios';
 const PrintPrimes = () => {
 
     //Prime generator function (Brute Approach)
@@ -19,7 +19,8 @@ const PrintPrimes = () => {
                 output.push(i);
             }
         }
-        return output;
+        const sz = output.length;
+        return { output, sz };
     }
 
     //Prime generator function (Sqrt Approach)
@@ -36,7 +37,8 @@ const PrintPrimes = () => {
                 output.push(i);
             }
         }
-        return output;
+        const sz = output.length;
+        return { output, sz };
     }
 
     //Function to find prime till root R (basic prime seive)
@@ -87,7 +89,8 @@ const PrintPrimes = () => {
                 output.push(i);
             }
         }
-        return output;
+        const sz = output.length;
+        return { output, sz };
     }
 
     let { Low, High, Choice } = useParams();
@@ -99,31 +102,50 @@ const PrintPrimes = () => {
     let flag = true;
     if (High < Low) flag = false;
     const [Output, setOutput] = useState([]);
+    const [Size, setSize] = useState(0);
     const [isLoading, setisLoading] = useState(true);
+    const [timeTaken, settimeTaken] = useState(0);
     useEffect(() => {
-        // const start = window.performance.now();
+        if (isLoading === false) {
+            const data = { Low, High, timeTaken, Choice, Size };
+            axios.post(`https://robust-prime-generator.herokuapp.com/primegenerator/${Low}/${High}/${Choice}`, data)
+                .then(() => console.log("Data sent Successfully"))
+                .catch((err) => console.log("Error got while axios post from react"))
+        }
+        const start = window.performance.now();
         let myLow = Low; if (myLow < 2) myLow = 2;
         let myHigh = High;
         if (myHigh >= myLow) {
-            if (newChoice === 1) setOutput(getprimeBrute(myLow, myHigh));
-            else if (newChoice === 2) setOutput(getprimeSqrt(myLow, myHigh));
-            else setOutput(getprimeSegmentedSeive(myLow, myHigh));
+            if (newChoice === 1) {
+                const Ans = getprimeBrute(myLow, myHigh);
+                setOutput(Ans.output); setSize(Ans.sz);
+            }
+            else if (newChoice === 2) {
+                const Ans = getprimeSqrt(myLow, myHigh);
+                setOutput(Ans.output); setSize(Ans.sz);
+            }
+            else {
+                const Ans = getprimeSegmentedSeive(myLow, myHigh);
+                setOutput(Ans.output); setSize(Ans.sz);
+            }
         }
-        // const end = window.performance.now();
+        const end = window.performance.now();
         setisLoading(false);
-        // const time_elapsed = end - start;
+        const time_elapsed = end - start;
+        settimeTaken(time_elapsed);
+
         // console.log(`Time taken is ${time_elapsed} ms`);
 
-    }, [])
+    }, [isLoading])
     return (
         <div className='myclass' style={{ paddingTop: "20px", paddingLeft: "20px" }}>
             <br />
             {flag === false ? (<h1>Oops !! Invalid Input</h1>) : (
                 <div >
                     {isLoading === true ? (<div className='centering'><ClipLoader color={"36D7B7"} size={150} loading={isLoading} /></div>) : (
-                        <div>{Output.length === 0 ? (<h1>No Prime Numbers in the range of {Low} to {High}</h1>) : (
+                        <div>{Size === 0 ? (<h1>No Prime Numbers in the range of {Low} to {High}</h1>) : (
                             <div>
-                                <h4 style={{}}>Number of Prime Numbers in the range {Low} to {High} is {Output.length} </h4>
+                                <h4 style={{}}>Number of Prime Numbers in the range {Low} to {High} is {Size} </h4>
                                 <h4>Below is the list : </h4>
                                 <ul>
                                     {
