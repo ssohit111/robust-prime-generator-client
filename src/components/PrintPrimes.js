@@ -102,13 +102,12 @@ const PrintPrimes = () => {
     const [isLoading, setisLoading] = useState(true);
     useEffect(() => {
         // const start = window.performance.now();
-        if (newChoice === 1) setOutput(getprimeBrute(Low, High));
-        else if (newChoice === 2) setOutput(getprimeSqrt(Low, High));
-        else {
-            let myLow = Low;
-            if (myLow < 2) myLow = 2;
-            let myHigh = High;
-            if (myHigh > myLow) setOutput(getprimeSegmentedSeive(myLow, myHigh));
+        let myLow = Low; if (myLow < 2) myLow = 2;
+        let myHigh = High;
+        if (myHigh >= myLow) {
+            if (newChoice === 1) setOutput(getprimeBrute(myLow, myHigh));
+            else if (newChoice === 2) setOutput(getprimeSqrt(myLow, myHigh));
+            else setOutput(getprimeSegmentedSeive(myLow, myHigh));
         }
         // const end = window.performance.now();
         setisLoading(false);
