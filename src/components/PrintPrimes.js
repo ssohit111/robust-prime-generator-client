@@ -101,13 +101,18 @@ const PrintPrimes = () => {
     const [Output, setOutput] = useState([]);
     const [isLoading, setisLoading] = useState(true);
     useEffect(() => {
-        const start = window.performance.now();
+        // const start = window.performance.now();
         if (newChoice === 1) setOutput(getprimeBrute(Low, High));
         else if (newChoice === 2) setOutput(getprimeSqrt(Low, High));
-        else setOutput(getprimeSegmentedSeive(Low, High));
-        const end = window.performance.now();
+        else {
+            let myLow = Low;
+            if (myLow < 2) myLow = 2;
+            let myHigh = High;
+            if (myHigh > myLow) setOutput(getprimeSegmentedSeive(myLow, myHigh));
+        }
+        // const end = window.performance.now();
         setisLoading(false);
-        const time_elapsed = end - start;
+        // const time_elapsed = end - start;
         // console.log(`Time taken is ${time_elapsed} ms`);
 
     }, [])
